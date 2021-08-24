@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Alert, Dimensions, StyleSheet } from "react-native";
 import { Camera } from "expo-camera";
 import colours from "../../colours";
 
 import Welcome from "./Welcome";
 import Permissions from "./Permissions";
+import Scanner from "./Scanner";
 
 enum OnboardingPhase {
   Welcome,
@@ -45,6 +46,12 @@ class Onboarding extends React.Component<{}, OnboardingState> {
           styles={styles}
           permissionCallback={this.grantPermissions}
           backCallback={() => this.setState({ phase: OnboardingPhase.Welcome })} />;
+
+      case OnboardingPhase.Scan:
+        return <Scanner
+          styles={styles}
+          successCallback={(data) => Alert.alert(data)}
+          backCallback={() => this.setState({ phase: OnboardingPhase.Permission })} />
     }
   }
 }
@@ -82,6 +89,19 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: "center",
     color: colours.lightest
+  },
+  cameraView: {
+    position: "relative",
+    width: "100%",
+    height: Dimensions.get("screen").width - 128,
+    marginTop: 48,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  camera: {
+    position: "absolute",
+    width: "100%",
+    height: (Dimensions.get("screen").width - 128) * (16 / 9)
   }
 });
 
