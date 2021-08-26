@@ -19,8 +19,14 @@ import QRCode from "react-native-qrcode-svg";
 import SizedImage from "../components/SizedImage";
 import Button from "../components/Button";
 import SmallButton from "../components/SmallButton";
+import Verify from "./Verify";
 
 const nhs = require("../../assets/nhs.png");
+
+enum ClientPhase {
+  Default,
+  Verify
+}
 
 interface ClientProps {
   certificate: Vaccert
@@ -28,13 +34,14 @@ interface ClientProps {
 
 interface ClientState {
   informationHeight?: number,
-  minimised: boolean
+  minimised: boolean,
+  phase: ClientPhase
 }
 
 class Client extends React.Component<ClientProps, ClientState> {
   constructor(props: ClientProps) {
     super(props);
-    this.state = { minimised: false };
+    this.state = { minimised: false, phase: ClientPhase.Default };
     this.updateHeight = this.updateHeight.bind(this);
     this.toggleMinimised = this.toggleMinimised.bind(this);
   }
@@ -53,62 +60,75 @@ class Client extends React.Component<ClientProps, ClientState> {
   }
 
   toggleMinimised() {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    LayoutAnimation.configureNext({
+      duration: 200,
+      update: {
+        type: LayoutAnimation.Types.easeInEaseOut
+      }
+    });
+
     this.setState({ minimised: !this.state.minimised });
   }
 
   render() {
-    let minimisedStyling: ViewStyle = this.state.minimised ?
-      { position: "absolute", bottom: 88 - this.state.informationHeight! } :
-      { position: "relative" };
-    let rotation: ViewStyle = this.state.minimised ?
-      { transform: [{ rotate: "180deg" }] } :
-      {};
+    if (this.state.phase === ClientPhase.Default) {
+      let minimisedStyling: ViewStyle = this.state.minimised ?
+        { position: "absolute", bottom: 88 - this.state.informationHeight! } :
+        { position: "relative" };
+      let rotation: ViewStyle = this.state.minimised ?
+        { transform: [{ rotate: "180deg" }] } :
+        {};
 
-    return (
-      <View style={styles.container}>
-        <StatusBar translucent={true} style="dark" />
+      return (
+        <View style={styles.container}>
+          <StatusBar translucent={true} style="dark" />
 
-        <View style={styles.codeContainer}>
-          <QRCode
-            value={JSON.stringify(this.props.certificate)}
-            size={Dimensions.get("screen").width - 160} />
-        </View>
-
-        <View style={[styles.infoContainer, minimisedStyling]} onLayout={this.updateHeight}>
-          <View style={[styles.minimiseButton, rotation]}>
-            <IconButton
-              icon="chevron-down"
-              size={32}
-              onPress={this.toggleMinimised}
-              background={TouchableNativeFeedback.Ripple("#bbccee", true)} />
+          <View style={styles.codeContainer}>
+            <QRCode
+              value={JSON.stringify(this.props.certificate)}
+              size={Dimensions.get("screen").width - (this.state.minimised ? 128 : 160)} />
           </View>
 
-          <SizedImage source={nhs} width={100} />
-          <Text style={[styles.nameText, { marginTop: this.state.minimised ? 32 : 16 }]}>
-            {this.props.certificate.data.name}
-          </Text>
-          <Text style={styles.subtitle}>
-            {this.props.certificate.data.nhsNumber} • {this.parseTimestamp(this.props.certificate.data.dateOfBirth)}
-          </Text>
+          <View style={[styles.infoContainer, minimisedStyling]} onLayout={this.updateHeight}>
+            <View style={[styles.minimiseButton, rotation]}>
+              <IconButton
+                icon="chevron-down"
+                size={32}
+                onPress={this.toggleMinimised}
+                background={TouchableNativeFeedback.Ripple("#bbccee", true)} />
+            </View>
 
-          <View style={styles.buttons}>
-            <SmallButton
-              text={this.parseTimestamp(this.props.certificate.data.vaccinations[0].date)}
-              onPress={() => { }}
-              style={[styles.button, { marginRight: 12 }]} />
-            <SmallButton
-              text={this.props.certificate.data.vaccinations.length > 1 ?
-                this.parseTimestamp(this.props.certificate.data.vaccinations[1].date) :
-                "Pending"}
-              onPress={() => { }}
-              style={[styles.button, { marginLeft: 12 }]} />
+            <SizedImage source={nhs} width={100} />
+            <Text style={[styles.nameText, { marginTop: this.state.minimised ? 32 : 16 }]}>
+              {this.props.certificate.data.name}
+            </Text>
+            <Text style={styles.subtitle}>
+              {this.props.certificate.data.nhsNumber} • {this.parseTimestamp(this.props.certificate.data.dateOfBirth)}
+            </Text>
+
+            <View style={styles.buttons}>
+              <SmallButton
+                text={this.parseTimestamp(this.props.certificate.data.vaccinations[0].date)}
+                onPress={() => { }}
+                style={[styles.button, { marginRight: 12 }]} />
+              <SmallButton
+                text={this.props.certificate.data.vaccinations.length > 1 ?
+                  this.parseTimestamp(this.props.certificate.data.vaccinations[1].date) :
+                  "Pending"}
+                onPress={() => { }}
+                style={[styles.button, { marginLeft: 12 }]} />
+            </View>
+
+            <Button
+              text="Verify a Vaccert"
+              onPress={() => this.setState({ phase: ClientPhase.Verify })}
+              style={{ marginTop: 24 }} />
           </View>
-
-          <Button text="Verify a Vaccert" onPress={() => { }} style={{ marginTop: 24 }} />
         </View>
-      </View>
-    );
+      );
+    } else if (this.state.phase === ClientPhase.Verify) {
+      return <Verify finishCallback={() => this.setState({ phase: ClientPhase.Default })} />
+    }
   }
 }
 

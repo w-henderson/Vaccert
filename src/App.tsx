@@ -7,6 +7,7 @@ import { Vaccert } from "./types";
 
 import Onboarding from "./screens/onboarding/Onboarding";
 import Client from "./screens/Client";
+import Verify from "./screens/Verify";
 
 export enum AppPhase {
   Loading,
@@ -58,9 +59,11 @@ class App extends React.Component<{}, AppState> {
       case AppPhase.Onboarding:
         return <Onboarding
           clientCallback={this.loadedVaccert}
-          verifyCallback={() => { }} />;
+          verifyCallback={() => this.setState({ phase: AppPhase.Verify })} />;
 
       case AppPhase.Client: return <Client certificate={this.state.certificate!} />
+
+      case AppPhase.Verify: return <Verify finishCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
 
       default: return null;
     }

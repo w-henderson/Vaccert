@@ -1,3 +1,4 @@
+import { LogBox } from 'react-native';
 import firebase from "firebase/app";
 import "firebase/database";
 
@@ -12,3 +13,5 @@ const FIREBASE_CONFIG = {
 }
 
 firebase.initializeApp(FIREBASE_CONFIG);
+LogBox.ignoreLogs(['Setting a timer']);
+console.ignoredYellowBox = ['Setting a timer'];

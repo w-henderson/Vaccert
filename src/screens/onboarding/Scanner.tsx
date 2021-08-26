@@ -1,8 +1,9 @@
 import React from "react";
-import { Dimensions, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { IconButton } from "react-native-paper";
 import { BarCodeScanningResult, Camera } from "expo-camera";
+import { styles } from "./OnboardingStyles";
 import colours from "../../colours";
 
 import SizedImage from "../../components/SizedImage";
@@ -11,7 +12,7 @@ import { Vaccert } from "../../types";
 const nhs = require("../../../assets/nhs.png");
 
 interface ScannerProps {
-  styles: any,
+  bodyText: string,
   successCallback: (cert: Vaccert) => void,
   backCallback: () => void
 }
@@ -45,29 +46,29 @@ class Scanner extends React.Component<ScannerProps> {
 
   render() {
     return (
-      <View style={this.props.styles.container}>
+      <View style={styles.container}>
         <StatusBar translucent={true} style="light" />
 
         <IconButton
           icon="arrow-left"
           size={24}
           color={colours.lightest}
-          style={this.props.styles.backButton}
+          style={styles.backButton}
           onPress={this.props.backCallback} />
 
         <SizedImage source={nhs} width={100} />
 
-        <View style={this.props.styles.cameraView}>
+        <View style={styles.cameraView}>
           <Camera
-            style={this.props.styles.camera}
+            style={styles.camera}
             ratio="16:9"
             onBarCodeScanned={this.parseVaccert} />
         </View>
 
-        <View style={this.props.styles.text}>
-          <Text style={this.props.styles.title}>Scan the code.</Text>
-          <Text style={this.props.styles.body}>
-            This QR code contains information about your vaccination and is the final step in obtaining your Vaccert.
+        <View style={styles.text}>
+          <Text style={styles.title}>Scan the code.</Text>
+          <Text style={styles.body}>
+            {this.props.bodyText}
           </Text>
         </View>
       </View>

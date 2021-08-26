@@ -1,7 +1,5 @@
 import React from "react";
-import { Alert, Dimensions, StyleSheet } from "react-native";
 import { Camera } from "expo-camera";
-import colours from "../../colours";
 
 import Welcome from "./Welcome";
 import Permissions from "./Permissions";
@@ -50,77 +48,25 @@ class Onboarding extends React.Component<OnboardingProps, OnboardingState> {
     switch (this.state.phase) {
       case OnboardingPhase.Welcome:
         return <Welcome
-          styles={styles}
           installCallback={() => this.setState({ phase: OnboardingPhase.Permission })}
-          verifyCallback={() => { }} />;
+          verifyCallback={this.props.verifyCallback} />;
 
       case OnboardingPhase.Permission:
         return <Permissions
-          styles={styles}
           permissionCallback={this.grantPermissions}
           backCallback={() => this.setState({ phase: OnboardingPhase.Welcome })} />;
 
       case OnboardingPhase.Scan:
         return <Scanner
-          styles={styles}
+          bodyText="This QR code contains information about your vaccination and is the final step in obtaining your Vaccert."
           successCallback={this.finish}
           backCallback={() => this.setState({ phase: OnboardingPhase.Permission })} />
 
       case OnboardingPhase.Success:
         return <Success
-          styles={styles}
           finishCallback={() => this.props.clientCallback(this.state.certificate!)} />;
     }
   }
 }
-
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: colours.accent,
-    padding: 64,
-  },
-  backButton: {
-    position: "absolute",
-    top: 32,
-    left: 32
-  },
-  text: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    width: "100%"
-  },
-  title: {
-    fontFamily: "Inter-Bold",
-    fontSize: 32,
-    textAlign: "center",
-    color: colours.lightest,
-    marginBottom: 24
-  },
-  body: {
-    fontFamily: "Inter-Regular",
-    fontSize: 22,
-    textAlign: "center",
-    color: colours.lightest
-  },
-  cameraView: {
-    position: "relative",
-    width: "100%",
-    height: Dimensions.get("screen").width - 128,
-    marginTop: 48,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  camera: {
-    position: "absolute",
-    width: "100%",
-    height: (Dimensions.get("screen").width - 128) * (16 / 9)
-  }
-});
 
 export default Onboarding;

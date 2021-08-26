@@ -1,7 +1,8 @@
 import React from "react";
-import { Dimensions, Text, StyleSheet, View } from "react-native";
+import { Dimensions, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { IconButton } from "react-native-paper";
+import { styles } from "./OnboardingStyles";
 import colours from "../../colours";
 
 import SizedImage from "../../components/SizedImage";
@@ -11,7 +12,6 @@ const camera = require("../../../assets/illustrations/camera.png");
 const nhs = require("../../../assets/nhs.png");
 
 interface PermissionsProps {
-  styles: any,
   permissionCallback: () => void,
   backCallback: () => void
 }
@@ -19,14 +19,14 @@ interface PermissionsProps {
 class Permissions extends React.Component<PermissionsProps> {
   render() {
     return (
-      <View style={this.props.styles.container}>
+      <View style={styles.container}>
         <StatusBar translucent={true} style="light" />
 
         <IconButton
           icon="arrow-left"
           size={24}
           color={colours.lightest}
-          style={this.props.styles.backButton}
+          style={styles.backButton}
           onPress={this.props.backCallback} />
 
         <SizedImage source={nhs} width={100} />
@@ -35,9 +35,9 @@ class Permissions extends React.Component<PermissionsProps> {
           width={Dimensions.get("screen").width - 128}
           style={{ marginTop: 48 }} />
 
-        <View style={this.props.styles.text}>
-          <Text style={this.props.styles.title}>Please allow camera access.</Text>
-          <Text style={this.props.styles.body}>This is required to scan the Vaccert QR code.</Text>
+        <View style={styles.text}>
+          <Text style={styles.title}>Please allow camera access.</Text>
+          <Text style={styles.body}>This is required to scan the Vaccert QR code.</Text>
         </View>
 
         <Button text="Grant Permission" onPress={this.props.permissionCallback} />

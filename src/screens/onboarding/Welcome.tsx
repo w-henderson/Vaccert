@@ -1,6 +1,7 @@
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { styles } from "./OnboardingStyles";
 
 import SizedImage from "../../components/SizedImage";
 import Button from "../../components/Button";
@@ -9,7 +10,6 @@ const hello = require("../../../assets/illustrations/hello.png");
 const nhs = require("../../../assets/nhs.png");
 
 interface WelcomeProps {
-  styles: any,
   installCallback: () => void,
   verifyCallback: () => void
 }
@@ -17,7 +17,7 @@ interface WelcomeProps {
 class Welcome extends React.Component<WelcomeProps> {
   render() {
     return (
-      <View style={this.props.styles.container}>
+      <View style={styles.container}>
         <StatusBar translucent={true} style="light" />
 
         <SizedImage source={nhs} width={100} />
@@ -26,9 +26,9 @@ class Welcome extends React.Component<WelcomeProps> {
           width={Dimensions.get("window").width - 128}
           style={{ marginTop: 48 }} />
 
-        <View style={this.props.styles.text}>
-          <Text style={this.props.styles.title}>Welcome to the Vaccert app!</Text>
-          <Text style={this.props.styles.body}>Let's start getting your Vaccert set up.</Text>
+        <View style={styles.text}>
+          <Text style={styles.title}>Welcome to the Vaccert app!</Text>
+          <Text style={styles.body}>Let's start getting your Vaccert set up.</Text>
         </View>
 
         <Button text="Install a Vaccert" onPress={this.props.installCallback} />
