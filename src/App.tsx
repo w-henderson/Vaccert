@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 import { StatusBar } from "expo-status-bar";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 
 import Onboarding from "./screens/onboarding/Onboarding";
+import Keystore from "./crypto/keystore";
 
 export enum AppPhase {
   Loading,

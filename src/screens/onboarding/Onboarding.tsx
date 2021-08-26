@@ -6,6 +6,8 @@ import colours from "../../colours";
 import Welcome from "./Welcome";
 import Permissions from "./Permissions";
 import Scanner from "./Scanner";
+import Success from "./Success";
+import { Vaccert } from "../../types";
 
 enum OnboardingPhase {
   Welcome,
@@ -15,7 +17,8 @@ enum OnboardingPhase {
 }
 
 interface OnboardingState {
-  phase: OnboardingPhase
+  phase: OnboardingPhase,
+  certificate?: Vaccert
 }
 
 class Onboarding extends React.Component<{}, OnboardingState> {
@@ -23,6 +26,7 @@ class Onboarding extends React.Component<{}, OnboardingState> {
     super(props);
     this.state = { phase: OnboardingPhase.Welcome };
     this.grantPermissions = this.grantPermissions.bind(this);
+    this.finish = this.finish.bind(this);
   }
 
   grantPermissions() {
@@ -31,6 +35,10 @@ class Onboarding extends React.Component<{}, OnboardingState> {
         this.setState({ phase: OnboardingPhase.Scan });
       }
     });
+  }
+
+  finish(cert: Vaccert) {
+    this.setState({ certificate: cert, phase: OnboardingPhase.Success });
   }
 
   render() {
@@ -50,8 +58,13 @@ class Onboarding extends React.Component<{}, OnboardingState> {
       case OnboardingPhase.Scan:
         return <Scanner
           styles={styles}
-          successCallback={(data) => Alert.alert(data)}
+          successCallback={this.finish}
           backCallback={() => this.setState({ phase: OnboardingPhase.Permission })} />
+
+      case OnboardingPhase.Success:
+        return <Success
+          styles={styles}
+          finishCallback={() => { }} />;
     }
   }
 }
