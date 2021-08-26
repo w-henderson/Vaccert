@@ -4,13 +4,13 @@ import { StyleSheet, TouchableNativeFeedback, Text, View } from "react-native";
 
 import colours from "../colours";
 
-interface ButtonProps {
+interface SmallButtonProps {
   text: string,
   style?: StyleProp<ViewStyle>,
   onPress: () => void
 }
 
-class Button extends React.Component<ButtonProps> {
+class SmallButton extends React.Component<SmallButtonProps> {
   render() {
     return (
       <View style={this.props.style ? [styles.wrapper, this.props.style] : styles.wrapper}>
@@ -30,24 +30,23 @@ class Button extends React.Component<ButtonProps> {
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: "100%",
     borderRadius: 8,
     overflow: "hidden"
   },
   button: {
     width: "100%",
-    height: 64,
+    height: 38,
     borderRadius: 8,
-    backgroundColor: colours.light,
+    backgroundColor: colours.accentLight,
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   text: {
-    color: colours.dark,
+    color: colours.lightest,
     fontFamily: "Inter-SemiBold",
-    fontSize: 18
+    fontSize: 16
   }
 });
 
-export default Button;
+export default SmallButton;

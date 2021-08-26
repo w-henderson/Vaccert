@@ -16,13 +16,18 @@ enum OnboardingPhase {
   Success
 }
 
+interface OnboardingProps {
+  clientCallback: (cert: Vaccert) => void,
+  verifyCallback: () => void
+}
+
 interface OnboardingState {
   phase: OnboardingPhase,
   certificate?: Vaccert
 }
 
-class Onboarding extends React.Component<{}, OnboardingState> {
-  constructor(props: {}) {
+class Onboarding extends React.Component<OnboardingProps, OnboardingState> {
+  constructor(props: OnboardingProps) {
     super(props);
     this.state = { phase: OnboardingPhase.Welcome };
     this.grantPermissions = this.grantPermissions.bind(this);
@@ -64,7 +69,7 @@ class Onboarding extends React.Component<{}, OnboardingState> {
       case OnboardingPhase.Success:
         return <Success
           styles={styles}
-          finishCallback={() => { }} />;
+          finishCallback={() => this.props.clientCallback(this.state.certificate!)} />;
     }
   }
 }

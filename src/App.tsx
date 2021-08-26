@@ -1,12 +1,11 @@
 import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
 
-import { StatusBar } from "expo-status-bar";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
+import { Vaccert } from "./types";
 
 import Onboarding from "./screens/onboarding/Onboarding";
-import Keystore from "./crypto/keystore";
+import Client from "./screens/Client";
 
 export enum AppPhase {
   Loading,
@@ -17,7 +16,8 @@ export enum AppPhase {
 }
 
 interface AppState {
-  phase: AppPhase
+  phase: AppPhase,
+  certificate?: Vaccert
 }
 
 class App extends React.Component<{}, AppState> {
@@ -26,6 +26,8 @@ class App extends React.Component<{}, AppState> {
     this.state = {
       phase: AppPhase.Loading
     };
+
+    this.loadedVaccert = this.loadedVaccert.bind(this);
   }
 
   componentDidMount() {
@@ -46,9 +48,19 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  loadedVaccert(cert: Vaccert) {
+    this.setState({ certificate: cert, phase: AppPhase.Client });
+  }
+
   render() {
     switch (this.state.phase) {
-      case AppPhase.Onboarding: return <Onboarding />;
+      case AppPhase.Onboarding:
+        return <Onboarding
+          clientCallback={this.loadedVaccert}
+          verifyCallback={() => { }} />;
+
+      case AppPhase.Client: return <Client certificate={this.state.certificate!} />
+
       default: return null;
     }
   }

@@ -32,7 +32,7 @@ class Welcome extends React.Component<WelcomeProps> {
         </View>
 
         <Button text="Install a Vaccert" onPress={this.props.installCallback} />
-        <Button text="Verify a Vaccert" onPress={this.props.verifyCallback} marginTop={true} />
+        <Button text="Verify a Vaccert" onPress={this.props.verifyCallback} style={{ marginTop: 18 }} />
       </View>
     )
   }

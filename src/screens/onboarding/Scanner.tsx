@@ -26,8 +26,6 @@ class Scanner extends React.Component<ScannerProps> {
     try {
       let json = JSON.parse(data.data);
 
-      console.log(json);
-
       // Check whether the required fields are present
       if (json.data !== undefined &&
         json.signatureId !== undefined &&
