@@ -1,5 +1,15 @@
 import React from "react";
-import { Dimensions, StyleSheet, Text, TouchableNativeFeedback, View } from "react-native";
+import {
+  Dimensions,
+  LayoutAnimation,
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  TouchableNativeFeedback,
+  View,
+  ViewStyle
+} from "react-native";
+
 import { IconButton } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { Vaccert } from "../types";
@@ -16,7 +26,19 @@ interface ClientProps {
   certificate: Vaccert
 }
 
-class Client extends React.Component<ClientProps> {
+interface ClientState {
+  informationHeight?: number,
+  minimised: boolean
+}
+
+class Client extends React.Component<ClientProps, ClientState> {
+  constructor(props: ClientProps) {
+    super(props);
+    this.state = { minimised: false };
+    this.updateHeight = this.updateHeight.bind(this);
+    this.toggleMinimised = this.toggleMinimised.bind(this);
+  }
+
   parseTimestamp(timestamp: number): string {
     let date = new Date(timestamp * 1000);
     return date.getDate().toString().padStart(2, "0") + "/"
@@ -24,8 +46,24 @@ class Client extends React.Component<ClientProps> {
       + date.getFullYear().toString();
   }
 
-  render() {
+  updateHeight(e: LayoutChangeEvent) {
+    if (!this.state.informationHeight) {
+      this.setState({ informationHeight: e.nativeEvent.layout.height });
+    }
+  }
 
+  toggleMinimised() {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    this.setState({ minimised: !this.state.minimised });
+  }
+
+  render() {
+    let minimisedStyling: ViewStyle = this.state.minimised ?
+      { position: "absolute", bottom: 88 - this.state.informationHeight! } :
+      { position: "relative" };
+    let rotation: ViewStyle = this.state.minimised ?
+      { transform: [{ rotate: "180deg" }] } :
+      {};
 
     return (
       <View style={styles.container}>
@@ -37,17 +75,19 @@ class Client extends React.Component<ClientProps> {
             size={Dimensions.get("screen").width - 160} />
         </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.minimiseButton}>
+        <View style={[styles.infoContainer, minimisedStyling]} onLayout={this.updateHeight}>
+          <View style={[styles.minimiseButton, rotation]}>
             <IconButton
               icon="chevron-down"
               size={32}
-              onPress={() => { }}
+              onPress={this.toggleMinimised}
               background={TouchableNativeFeedback.Ripple("#bbccee", true)} />
           </View>
 
           <SizedImage source={nhs} width={100} />
-          <Text style={styles.nameText}>{this.props.certificate.data.name}</Text>
+          <Text style={[styles.nameText, { marginTop: this.state.minimised ? 32 : 16 }]}>
+            {this.props.certificate.data.name}
+          </Text>
           <Text style={styles.subtitle}>
             {this.props.certificate.data.nhsNumber} • {this.parseTimestamp(this.props.certificate.data.dateOfBirth)}
           </Text>
@@ -86,8 +126,8 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   infoContainer: {
-    position: "relative",
     padding: 32,
+    width: "100%",
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     backgroundColor: colours.accent
@@ -96,19 +136,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 32,
     right: 32,
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     borderRadius: 24,
     backgroundColor: colours.lightest,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    overflow: "hidden"
   },
   nameText: {
     fontFamily: "Inter-SemiBold",
     fontSize: 24,
-    color: colours.lightest,
-    marginTop: 16
+    color: colours.lightest
   },
   subtitle: {
     fontFamily: "Inter-Regular",

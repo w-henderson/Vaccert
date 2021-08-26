@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Platform, UIManager } from "react-native";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 import { Vaccert } from "./types";
@@ -63,6 +64,12 @@ class App extends React.Component<{}, AppState> {
 
       default: return null;
     }
+  }
+}
+
+if (Platform.OS === "android") {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 }
 
