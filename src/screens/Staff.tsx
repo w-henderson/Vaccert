@@ -2,7 +2,7 @@ import React from "react";
 import { Text, Dimensions, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { BarCodeScanningResult } from "expo-camera";
-import { StaffData } from "../types";
+import { ClientData, StaffData, Vaccert, Vaccination } from "../types";
 import { styles } from "./onboarding/OnboardingStyles";
 import { nhs } from "../globals";
 
@@ -11,7 +11,9 @@ import Button from "../components/Button";
 
 import Permissions from "./onboarding/Permissions";
 import Scanner from "./onboarding/Scanner";
-import PersonalDetails from "./input/PersonalDetails";
+import VaccinationInput from "./input/VaccinationInput";
+import Client from "./Client";
+import PersonalDetails, { PersonalDetailsResult } from "./input/PersonalDetails";
 
 import PrivateKey from "../crypto/privatekey";
 
@@ -34,6 +36,8 @@ interface StaffProps {
 
 interface StaffState {
   phase: StaffPhase,
+  newUserDetails?: PersonalDetailsResult,
+  newUserVaccinations?: Vaccination[],
   staffData?: StaffData
 }
 
@@ -42,6 +46,8 @@ class Staff extends React.Component<StaffProps, StaffState> {
     super(props);
     this.state = { phase: StaffPhase.Permissions };
     this.parseStaffCode = this.parseStaffCode.bind(this);
+    this.detailsCallback = this.detailsCallback.bind(this);
+    this.doseOneCallback = this.doseOneCallback.bind(this);
   }
 
   parseStaffCode(code: BarCodeScanningResult) {
@@ -64,6 +70,24 @@ class Staff extends React.Component<StaffProps, StaffState> {
         });
       }
     } catch (_) { }
+  }
+
+  detailsCallback(details: PersonalDetailsResult) {
+    this.setState({
+      newUserDetails: details,
+      phase: StaffPhase.DoseOne
+    });
+  }
+
+  doseOneCallback(dose: Vaccination) {
+    let vaccinations = this.state.newUserVaccinations;
+    if (vaccinations !== undefined) vaccinations?.push(dose);
+    else vaccinations = [dose];
+
+    this.setState({
+      newUserVaccinations: vaccinations,
+      phase: StaffPhase.Result
+    });
   }
 
   render() {
@@ -105,7 +129,33 @@ class Staff extends React.Component<StaffProps, StaffState> {
         )
 
       case StaffPhase.PersonalDetails:
-        return <PersonalDetails />
+        return <PersonalDetails callback={this.detailsCallback} />
+
+      case StaffPhase.DoseOne:
+        return <VaccinationInput callback={this.doseOneCallback} />
+
+      case StaffPhase.Result: {
+        let unsignedCertificate: ClientData = {
+          name: this.state.newUserDetails!.name,
+          nhsNumber: this.state.newUserDetails!.nhsNumber,
+          dateOfBirth: this.state.newUserDetails!.dateOfBirth,
+          vaccinations: this.state.newUserVaccinations!
+        };
+
+        let unsignedCertificateString = JSON.stringify(unsignedCertificate);
+        let signedCertificateString = this.state.staffData!.key.sign(unsignedCertificateString);
+
+        let signedCertificate: Vaccert = {
+          data: unsignedCertificate,
+          signature: signedCertificateString,
+          signatureId: this.state.staffData!.id
+        }
+
+        return <Client
+          certificate={signedCertificate}
+          actionButtonText="Finish"
+          actionButtonCallback={() => this.setState({ phase: StaffPhase.Menu })} />
+      }
     }
   }
 }

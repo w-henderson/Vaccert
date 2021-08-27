@@ -27,7 +27,9 @@ enum ClientPhase {
 }
 
 interface ClientProps {
-  certificate: Vaccert
+  certificate: Vaccert,
+  actionButtonText?: string,
+  actionButtonCallback?: () => void
 }
 
 interface ClientState {
@@ -118,8 +120,8 @@ class Client extends React.Component<ClientProps, ClientState> {
             </View>
 
             <Button
-              text="Verify a Vaccert"
-              onPress={() => this.setState({ phase: ClientPhase.Verify })}
+              text={this.props.actionButtonText ?? "Verify a Vaccert"}
+              onPress={this.props.actionButtonCallback ?? (() => this.setState({ phase: ClientPhase.Verify }))}
               style={{ marginTop: 24 }} />
           </View>
         </View>
