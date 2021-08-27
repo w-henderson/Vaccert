@@ -2,12 +2,12 @@ import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "./OnboardingStyles";
+import { nhs } from "../../globals";
 
 import SizedImage from "../../components/SizedImage";
 import Button from "../../components/Button";
 
 const success = require("../../../assets/illustrations/confirmed.png");
-const nhs = require("../../../assets/nhs.png");
 
 interface SuccessProps {
   finishCallback: () => void,

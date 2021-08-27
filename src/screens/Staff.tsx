@@ -4,21 +4,28 @@ import { StatusBar } from "expo-status-bar";
 import { BarCodeScanningResult } from "expo-camera";
 import { StaffData } from "../types";
 import { styles } from "./onboarding/OnboardingStyles";
+import { nhs } from "../globals";
 
 import SizedImage from "../components/SizedImage";
 import Button from "../components/Button";
 
 import Permissions from "./onboarding/Permissions";
 import Scanner from "./onboarding/Scanner";
+import PersonalDetails from "./input/PersonalDetails";
+
 import PrivateKey from "../crypto/privatekey";
 
-const nhs = require("../../assets/nhs.png");
 const staffImage = require("../../assets/illustrations/staff.png");
 
 enum StaffPhase {
   Permissions,
   Scan,
-  Menu
+  Menu,
+  PersonalDetails,
+  DoseOne,
+  OldCode,
+  DoseTwo,
+  Result
 }
 
 interface StaffProps {
@@ -92,10 +99,13 @@ class Staff extends React.Component<StaffProps, StaffState> {
               <Text style={styles.body}>Welcome back to Vaccert, {this.state.staffData!.name}.</Text>
             </View>
 
-            <Button text="Create New Vaccert" onPress={() => { }} />
-            <Button text="Add Second Dose" onPress={() => { }} style={{ marginTop: 18 }} />
+            <Button text="Create New Vaccert" onPress={() => this.setState({ phase: StaffPhase.PersonalDetails })} />
+            <Button text="Add Second Dose" onPress={() => this.setState({ phase: StaffPhase.OldCode })} style={{ marginTop: 18 }} />
           </View>
         )
+
+      case StaffPhase.PersonalDetails:
+        return <PersonalDetails />
     }
   }
 }

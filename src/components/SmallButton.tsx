@@ -2,7 +2,7 @@ import React from "react";
 import { StyleProp, ViewStyle } from "react-native";
 import { StyleSheet, TouchableNativeFeedback, Text, View } from "react-native";
 
-import colours from "../colours";
+import { colours } from "../globals";
 
 interface SmallButtonProps {
   text: string,

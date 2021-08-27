@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { Camera } from "expo-camera";
 import { Vaccert } from "../types";
 import { styles } from "./onboarding/OnboardingStyles";
-import colours from "../colours";
+import { colours, nhs } from "../globals";
 
 import { verify } from "../crypto/certification";
 
@@ -15,7 +15,6 @@ import Button from "../components/Button";
 
 const valid = require("../../assets/illustrations/valid.png");
 const invalid = require("../../assets/illustrations/invalid.png");
-const nhs = require("../../assets/nhs.png");
 
 enum VerifyPhase {
   Loading,

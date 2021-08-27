@@ -3,13 +3,12 @@ import { Dimensions, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { IconButton } from "react-native-paper";
 import { styles } from "./OnboardingStyles";
-import colours from "../../colours";
+import { colours, nhs } from "../../globals";
 
 import SizedImage from "../../components/SizedImage";
 import Button from "../../components/Button";
 
 const camera = require("../../../assets/illustrations/camera.png");
-const nhs = require("../../../assets/nhs.png");
 
 interface PermissionsProps {
   permissionCallback: () => void,

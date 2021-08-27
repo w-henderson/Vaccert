@@ -13,15 +13,13 @@ import {
 import { IconButton } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { Vaccert } from "../types";
-import colours from "../colours";
+import { colours, nhs } from "../globals";
 
 import QRCode from "react-native-qrcode-svg";
 import SizedImage from "../components/SizedImage";
 import Button from "../components/Button";
 import SmallButton from "../components/SmallButton";
 import Verify from "./Verify";
-
-const nhs = require("../../assets/nhs.png");
 
 enum ClientPhase {
   Default,

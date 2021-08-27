@@ -4,12 +4,10 @@ import { StatusBar } from "expo-status-bar";
 import { IconButton } from "react-native-paper";
 import { BarCodeScanningResult, Camera } from "expo-camera";
 import { styles } from "./OnboardingStyles";
-import colours from "../../colours";
+import { colours, nhs } from "../../globals";
 
 import SizedImage from "../../components/SizedImage";
 import { Vaccert } from "../../types";
-
-const nhs = require("../../../assets/nhs.png");
 
 interface ScannerProps {
   bodyText: string,
