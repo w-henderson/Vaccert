@@ -3,6 +3,7 @@ import React from "react";
 import { Platform, UIManager } from "react-native";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
+import { initFirebase } from "./crypto/keystore";
 import { Vaccert } from "./types";
 
 import Onboarding from "./screens/onboarding/Onboarding";
@@ -33,6 +34,8 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
+    initFirebase();
+
     loadAsync({
       "Inter-Regular": require("../assets/fonts/Inter-Regular.ttf"),
       "Inter-SemiBold": require("../assets/fonts/Inter-SemiBold.ttf"),

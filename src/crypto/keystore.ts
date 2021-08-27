@@ -13,7 +13,7 @@ const FIREBASE_CONFIG = {
   appId: process.env.VACCERT_APP_ID
 }
 
-firebase.initializeApp(FIREBASE_CONFIG);
+export const initFirebase = () => firebase.initializeApp(FIREBASE_CONFIG);
 
 class Keystore {
   db: firebase.database.Database;
