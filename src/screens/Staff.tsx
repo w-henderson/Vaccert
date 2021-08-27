@@ -24,9 +24,8 @@ enum StaffPhase {
   Scan,
   Menu,
   PersonalDetails,
-  DoseOne,
   OldCode,
-  DoseTwo,
+  Vaccination,
   Result
 }
 
@@ -47,7 +46,8 @@ class Staff extends React.Component<StaffProps, StaffState> {
     this.state = { phase: StaffPhase.Permissions };
     this.parseStaffCode = this.parseStaffCode.bind(this);
     this.detailsCallback = this.detailsCallback.bind(this);
-    this.doseOneCallback = this.doseOneCallback.bind(this);
+    this.vaccinationCallback = this.vaccinationCallback.bind(this);
+    this.scannedOldCode = this.scannedOldCode.bind(this);
   }
 
   parseStaffCode(code: BarCodeScanningResult) {
@@ -75,11 +75,11 @@ class Staff extends React.Component<StaffProps, StaffState> {
   detailsCallback(details: PersonalDetailsResult) {
     this.setState({
       newUserDetails: details,
-      phase: StaffPhase.DoseOne
+      phase: StaffPhase.Vaccination
     });
   }
 
-  doseOneCallback(dose: Vaccination) {
+  vaccinationCallback(dose: Vaccination) {
     let vaccinations = this.state.newUserVaccinations;
     if (vaccinations !== undefined) vaccinations?.push(dose);
     else vaccinations = [dose];
@@ -87,6 +87,18 @@ class Staff extends React.Component<StaffProps, StaffState> {
     this.setState({
       newUserVaccinations: vaccinations,
       phase: StaffPhase.Result
+    });
+  }
+
+  scannedOldCode(cert: Vaccert) {
+    this.setState({
+      newUserDetails: {
+        name: cert.data.name,
+        nhsNumber: cert.data.nhsNumber,
+        dateOfBirth: cert.data.dateOfBirth
+      },
+      newUserVaccinations: cert.data.vaccinations,
+      phase: StaffPhase.Vaccination
     });
   }
 
@@ -131,8 +143,14 @@ class Staff extends React.Component<StaffProps, StaffState> {
       case StaffPhase.PersonalDetails:
         return <PersonalDetails callback={this.detailsCallback} />
 
-      case StaffPhase.DoseOne:
-        return <VaccinationInput callback={this.doseOneCallback} />
+      case StaffPhase.Vaccination:
+        return <VaccinationInput callback={this.vaccinationCallback} />
+
+      case StaffPhase.OldCode:
+        return <Scanner
+          backCallback={() => this.setState({ phase: StaffPhase.Menu })}
+          successCallback={this.scannedOldCode}
+          bodyText="This code will be modified and re-signed to add and certify the second vaccine dose." />
 
       case StaffPhase.Result: {
         let unsignedCertificate: ClientData = {
