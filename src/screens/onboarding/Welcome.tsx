@@ -11,7 +11,8 @@ const nhs = require("../../../assets/nhs.png");
 
 interface WelcomeProps {
   installCallback: () => void,
-  verifyCallback: () => void
+  verifyCallback: () => void,
+  staffCallback: () => void
 }
 
 class Welcome extends React.Component<WelcomeProps> {
@@ -20,7 +21,10 @@ class Welcome extends React.Component<WelcomeProps> {
       <View style={styles.container}>
         <StatusBar translucent={true} style="light" />
 
-        <SizedImage source={nhs} width={100} />
+        <SizedImage
+          source={nhs}
+          width={100}
+          onPress={this.props.staffCallback} />
         <SizedImage
           source={hello}
           width={Dimensions.get("window").width - 128}

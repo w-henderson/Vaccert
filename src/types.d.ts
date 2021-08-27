@@ -22,5 +22,5 @@ interface Vaccination {
 interface StaffData {
   name: string,
   id: string,
-  privateKey: PrivateKey
+  key: PrivateKey
 }

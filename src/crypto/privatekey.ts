@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 class PrivateKey {
   key: string;
 
-  constructor(key: string, name: string) {
+  constructor(key: string) {
     this.key = key;
   }
 

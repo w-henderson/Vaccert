@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Platform, UIManager } from "react-native";
+import { Alert, Platform, UIManager } from "react-native";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 import { initFirebase } from "./crypto/keystore";
@@ -9,6 +9,7 @@ import { Vaccert } from "./types";
 import Onboarding from "./screens/onboarding/Onboarding";
 import Client from "./screens/Client";
 import Verify from "./screens/Verify";
+import Staff from "./screens/Staff";
 
 export enum AppPhase {
   Loading,
@@ -31,6 +32,7 @@ class App extends React.Component<{}, AppState> {
     };
 
     this.loadedVaccert = this.loadedVaccert.bind(this);
+    this.enterStaffMode = this.enterStaffMode.bind(this);
   }
 
   componentDidMount() {
@@ -57,16 +59,35 @@ class App extends React.Component<{}, AppState> {
     this.setState({ certificate: cert, phase: AppPhase.Client });
   }
 
+  enterStaffMode() {
+    Alert.alert(
+      "Enter staff mode?",
+      "You'll need your certification QR code with you until the set-up process is complete.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: () => this.setState({ phase: AppPhase.Staff })
+        }
+      ]);
+  }
+
   render() {
     switch (this.state.phase) {
       case AppPhase.Onboarding:
         return <Onboarding
           clientCallback={this.loadedVaccert}
-          verifyCallback={() => this.setState({ phase: AppPhase.Verify })} />;
+          verifyCallback={() => this.setState({ phase: AppPhase.Verify })}
+          staffCallback={this.enterStaffMode} />;
 
       case AppPhase.Client: return <Client certificate={this.state.certificate!} />
 
       case AppPhase.Verify: return <Verify finishCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
+
+      case AppPhase.Staff: return <Staff backCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
 
       default: return null;
     }

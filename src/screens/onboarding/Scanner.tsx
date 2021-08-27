@@ -13,7 +13,8 @@ const nhs = require("../../../assets/nhs.png");
 
 interface ScannerProps {
   bodyText: string,
-  successCallback: (cert: Vaccert) => void,
+  successCallback?: (cert: Vaccert) => void,
+  parseCallback?: (data: BarCodeScanningResult) => void,
   backCallback: () => void
 }
 
@@ -39,7 +40,7 @@ class Scanner extends React.Component<ScannerProps> {
           return v.date !== undefined && v.vaccine !== undefined && v.batch !== undefined;
         }).every((x: any) => x === true)) {
 
-        this.props.successCallback(json);
+        this.props.successCallback!(json);
       }
     } catch (_) { }
   }
@@ -62,7 +63,7 @@ class Scanner extends React.Component<ScannerProps> {
           <Camera
             style={styles.camera}
             ratio="16:9"
-            onBarCodeScanned={this.parseVaccert} />
+            onBarCodeScanned={this.props.parseCallback ?? this.parseVaccert} />
         </View>
 
         <View style={styles.text}>

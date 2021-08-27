@@ -16,7 +16,8 @@ enum OnboardingPhase {
 
 interface OnboardingProps {
   clientCallback: (cert: Vaccert) => void,
-  verifyCallback: () => void
+  verifyCallback: () => void,
+  staffCallback: () => void
 }
 
 interface OnboardingState {
@@ -49,7 +50,8 @@ class Onboarding extends React.Component<OnboardingProps, OnboardingState> {
       case OnboardingPhase.Welcome:
         return <Welcome
           installCallback={() => this.setState({ phase: OnboardingPhase.Permission })}
-          verifyCallback={this.props.verifyCallback} />;
+          verifyCallback={this.props.verifyCallback}
+          staffCallback={this.props.staffCallback} />;
 
       case OnboardingPhase.Permission:
         return <Permissions
