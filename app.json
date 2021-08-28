@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#005ebb"
-      }
+      },
+      "package": "com.whenderson.vaccert"
     },
     "web": {
       "favicon": "./assets/favicon.png"

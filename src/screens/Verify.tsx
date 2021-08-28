@@ -103,7 +103,7 @@ class Verify extends React.Component<VerifyProps, VerifyState> {
             <SizedImage source={nhs} width={100} />
             <SizedImage
               source={this.state.verificationResult ? valid : invalid}
-              width={Dimensions.get("window").width - 128}
+              width={Dimensions.get("window").width - 192}
               style={{ marginTop: 48 }} />
 
             <View style={styles.text}>

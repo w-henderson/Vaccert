@@ -22,7 +22,7 @@ class Success extends React.Component<SuccessProps> {
         <SizedImage source={nhs} width={100} />
         <SizedImage
           source={success}
-          width={Dimensions.get("window").width - 128}
+          width={Dimensions.get("window").width - 192}
           style={{ marginTop: 48 }} />
 
         <View style={styles.text}>
