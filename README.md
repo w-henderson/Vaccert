@@ -5,7 +5,7 @@
 </p>
 
 # Vaccert
-Vaccert is a cryptography-based vaccine certification app, built with React Native. It works in the exact same way as the [EU Digital COVID Certificate](https://ec.europa.eu/info/live-work-travel-eu/coronavirus-response/safe-covid-19-vaccines-europeans/eu-digital-covid-certificate_en), but is completely open-source and designed in accordance with the [NHS design system](https://service-manual.nhs.uk/design-system) for use in the United Kingdom. The one Vaccert app can be used by citizens to prove their vaccination status and verify those of others, as well as by NHS staff to issue and sign vaccination certificates.
+Vaccert is a cryptography-based vaccine certification app, built with React Native. It works in exactly the same way as the [EU Digital COVID Certificate](https://ec.europa.eu/info/live-work-travel-eu/coronavirus-response/safe-covid-19-vaccines-europeans/eu-digital-covid-certificate_en) and the [NHS COVID Pass](https://www.nhs.uk/conditions/coronavirus-covid-19/covid-pass/), but is faster, has a more modern and accessible UI, provides verification capabilities in the same app, and is completely open-source. The one Vaccert app can be used by citizens to prove their vaccination status and verify those of others, as well as by NHS staff to issue and sign vaccination certificates.
 
 ## Overview
 When a person is vaccinated, a member of NHS staff will open the Vaccert app and create a new certificate. The person's name, date of birth, and NHS number will be entered, along with details of the vaccination. The certificate will then be signed using a private key stored only on the member of staff's device, and a QR code will be generated for the person to scan, importing the certificate onto their device where it will be saved.
