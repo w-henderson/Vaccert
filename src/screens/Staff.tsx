@@ -15,6 +15,7 @@ import Permissions from "./onboarding/Permissions";
 import Scanner from "./onboarding/Scanner";
 import VaccinationInput from "./input/VaccinationInput";
 import Client from "./Client";
+import ExpiryDate from "./input/ExpiryDate";
 import PersonalDetails, { PersonalDetailsResult } from "./input/PersonalDetails";
 
 import PrivateKey from "../crypto/privatekey";
@@ -27,8 +28,10 @@ enum StaffPhase {
   Scan,
   Menu,
   PersonalDetails,
+  ExpiryDate,
   OldCode,
-  Vaccination,
+  VaccinationOne,
+  VaccinationTwo,
   Result
 }
 
@@ -41,6 +44,7 @@ interface StaffState {
   phase: StaffPhase,
   menuActive: boolean,
   newUserDetails?: PersonalDetailsResult,
+  newUserExpiryDate?: number,
   newUserVaccinations?: Vaccination[],
   staffData?: StaffData
 }
@@ -50,10 +54,13 @@ class Staff extends React.Component<StaffProps, StaffState> {
     super(props);
     this.state = { phase: StaffPhase.Loading, menuActive: false };
     this.parseStaffCode = this.parseStaffCode.bind(this);
-    this.detailsCallback = this.detailsCallback.bind(this);
+    this.addVaccinationCallback = this.addVaccinationCallback.bind(this);
+    this.addExpiryCallback = this.addExpiryCallback.bind(this);
     this.vaccinationCallback = this.vaccinationCallback.bind(this);
     this.scannedOldCode = this.scannedOldCode.bind(this);
     this.removeStaffKey = this.removeStaffKey.bind(this);
+    this.saveExpiryDate = this.saveExpiryDate.bind(this);
+    this.cleanUp = this.cleanUp.bind(this);
   }
 
   componentDidMount() {
@@ -101,10 +108,17 @@ class Staff extends React.Component<StaffProps, StaffState> {
     } catch (_) { }
   }
 
-  detailsCallback(details: PersonalDetailsResult) {
+  addVaccinationCallback(details: PersonalDetailsResult) {
     this.setState({
       newUserDetails: details,
-      phase: StaffPhase.Vaccination
+      phase: StaffPhase.VaccinationOne
+    });
+  }
+
+  addExpiryCallback(details: PersonalDetailsResult) {
+    this.setState({
+      newUserDetails: details,
+      phase: StaffPhase.ExpiryDate
     });
   }
 
@@ -119,6 +133,13 @@ class Staff extends React.Component<StaffProps, StaffState> {
     });
   }
 
+  saveExpiryDate(date: number) {
+    this.setState({
+      newUserExpiryDate: date,
+      phase: StaffPhase.Result
+    })
+  }
+
   scannedOldCode(cert: Vaccert) {
     this.setState({
       newUserDetails: {
@@ -127,7 +148,7 @@ class Staff extends React.Component<StaffProps, StaffState> {
         dateOfBirth: cert.data.dateOfBirth
       },
       newUserVaccinations: cert.data.vaccinations,
-      phase: StaffPhase.Vaccination
+      phase: StaffPhase.VaccinationTwo
     });
   }
 
@@ -146,6 +167,15 @@ class Staff extends React.Component<StaffProps, StaffState> {
           onPress: this.props.reset!
         }
       ]);
+  }
+
+  cleanUp() {
+    this.setState({
+      phase: StaffPhase.Menu,
+      newUserDetails: undefined,
+      newUserExpiryDate: undefined,
+      newUserVaccinations: undefined
+    })
   }
 
   render() {
@@ -212,14 +242,29 @@ class Staff extends React.Component<StaffProps, StaffState> {
         )
 
       case StaffPhase.PersonalDetails:
-        return <PersonalDetails callback={this.detailsCallback} />
+        return <PersonalDetails
+          addVaccinationCallback={this.addVaccinationCallback}
+          addExpiryCallback={this.addExpiryCallback}
+          backCallback={() => this.setState({ phase: StaffPhase.Menu, newUserDetails: undefined })} />
 
-      case StaffPhase.Vaccination:
-        return <VaccinationInput callback={this.vaccinationCallback} />
+      case StaffPhase.VaccinationOne:
+        return <VaccinationInput
+          callback={this.vaccinationCallback}
+          backCallback={() => this.setState({ phase: StaffPhase.PersonalDetails, newUserVaccinations: undefined })} />
+
+      case StaffPhase.VaccinationTwo:
+        return <VaccinationInput
+          callback={this.vaccinationCallback}
+          backCallback={() => this.setState({ phase: StaffPhase.OldCode, newUserVaccinations: undefined })} />
+
+      case StaffPhase.ExpiryDate:
+        return <ExpiryDate
+          callback={this.saveExpiryDate}
+          backCallback={() => this.setState({ phase: StaffPhase.PersonalDetails, newUserExpiryDate: undefined })} />
 
       case StaffPhase.OldCode:
         return <Scanner
-          backCallback={() => this.setState({ phase: StaffPhase.Menu })}
+          backCallback={() => this.setState({ phase: StaffPhase.Menu, newUserDetails: undefined })}
           successCallback={this.scannedOldCode}
           bodyText="This code will be modified and re-signed to add and certify the second vaccine dose." />
 
@@ -228,7 +273,8 @@ class Staff extends React.Component<StaffProps, StaffState> {
           name: this.state.newUserDetails!.name,
           nhsNumber: this.state.newUserDetails!.nhsNumber,
           dateOfBirth: this.state.newUserDetails!.dateOfBirth,
-          vaccinations: this.state.newUserVaccinations!
+          expiryDate: this.state.newUserExpiryDate,
+          vaccinations: this.state.newUserVaccinations || []
         };
 
         let unsignedCertificateString = JSON.stringify(unsignedCertificate);
@@ -243,7 +289,7 @@ class Staff extends React.Component<StaffProps, StaffState> {
         return <Client
           certificate={signedCertificate}
           actionButtonText="Finish"
-          actionButtonCallback={() => this.setState({ phase: StaffPhase.Menu })} />
+          actionButtonCallback={this.cleanUp} />
       }
     }
   }

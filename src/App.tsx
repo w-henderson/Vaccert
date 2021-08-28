@@ -84,6 +84,8 @@ class App extends React.Component<{}, AppState> {
 
   async reset() {
     await SecureStore.deleteItemAsync("VACCERT_MODE");
+    try { await SecureStore.deleteItemAsync("VACCERT_CERT") } catch (_) { }
+    try { await SecureStore.deleteItemAsync("VACCERT_STAFF") } catch (_) { }
     this.setState({ phase: AppPhase.Onboarding });
   }
 

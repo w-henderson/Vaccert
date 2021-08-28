@@ -10,6 +10,7 @@ interface ClientData {
   name: string,
   nhsNumber: string,
   dateOfBirth: number,
+  expiryDate?: number,
   vaccinations: Vaccination[]
 }
 

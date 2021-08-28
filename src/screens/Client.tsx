@@ -161,18 +161,29 @@ class Client extends React.Component<ClientProps, ClientState> {
               {this.props.certificate.data.nhsNumber} • {this.parseTimestamp(this.props.certificate.data.dateOfBirth)}
             </Text>
 
-            <View style={styles.buttons}>
-              <SmallButton
-                text={this.parseTimestamp(this.props.certificate.data.vaccinations[0].date)}
-                onPress={() => this.showVaccinationInfo(0)}
-                style={[styles.button, { marginRight: 12 }]} />
-              <SmallButton
-                text={this.props.certificate.data.vaccinations.length > 1 ?
-                  this.parseTimestamp(this.props.certificate.data.vaccinations[1].date) :
-                  "Pending"}
-                onPress={this.props.certificate.data.vaccinations.length > 1 ? () => this.showVaccinationInfo(1) : () => { }}
-                style={[styles.button, { marginLeft: 12 }]} />
-            </View>
+            {this.props.certificate.data.vaccinations.length > 0 &&
+              <View style={styles.buttons}>
+                <SmallButton
+                  text={this.parseTimestamp(this.props.certificate.data.vaccinations[0].date)}
+                  onPress={() => this.showVaccinationInfo(0)}
+                  style={[styles.button, { marginRight: 12 }]} />
+                <SmallButton
+                  text={this.props.certificate.data.vaccinations.length > 1 ?
+                    this.parseTimestamp(this.props.certificate.data.vaccinations[1].date) :
+                    "Pending"}
+                  onPress={this.props.certificate.data.vaccinations.length > 1 ? () => this.showVaccinationInfo(1) : () => { }}
+                  style={[styles.button, { marginLeft: 12 }]} />
+              </View>
+            }
+
+            {this.props.certificate.data.expiryDate !== undefined &&
+              <View style={styles.buttons}>
+                <SmallButton
+                  text={`Expiry Date: ${this.parseTimestamp(this.props.certificate.data.expiryDate)}`}
+                  onPress={() => { }}
+                  style={styles.button} />
+              </View>
+            }
 
             <Button
               text={this.props.actionButtonText ?? "Verify a Vaccert"}

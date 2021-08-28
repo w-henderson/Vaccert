@@ -62,6 +62,30 @@ class Verify extends React.Component<VerifyProps, VerifyState> {
   verifySignature(cert: Vaccert) {
     if (!this.state.attemptingToVerify) {
       this.setState({ attemptingToVerify: true });
+
+      // Verify the expiry date is valid
+      if (cert.data.expiryDate) {
+        let currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        let currentTimestamp = Math.floor(currentDate.getTime() / 1000);
+
+        let expiryDate = new Date(cert.data.expiryDate * 1000);
+        expiryDate.setHours(0, 0, 0, 0);
+        let expiryTimestamp = Math.floor(expiryDate.getTime() / 1000);
+
+        console.log({ currentTimestamp, expiryTimestamp });
+
+        if (expiryTimestamp < currentTimestamp) {
+          this.setState({
+            verificationResult: false,
+            attemptingToVerify: false,
+            phase: VerifyPhase.Result
+          });
+          return;
+        }
+      }
+
+      // Verify the signature is valid
       verify(cert).then(result => {
         this.setState({
           verificationResult: result,
@@ -110,7 +134,7 @@ class Verify extends React.Component<VerifyProps, VerifyState> {
               <Text style={styles.title}>{this.state.verificationResult ? "It's valid!" : "Invalid certificate."}</Text>
               <Text style={styles.body}>{this.state.verificationResult ?
                 "This Vaccert's digital signature was successfully verified using keys stored on our servers." :
-                "This Vaccert's digital signature appears to be invalid or revoked."
+                "This Vaccert's digital signature appears to be invalid or expired."
               }</Text>
             </View>
 

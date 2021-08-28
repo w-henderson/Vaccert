@@ -7,3 +7,7 @@ export const colours = {
 };
 
 export const nhs = require("../assets/nhs.png");
+
+export const dateFormat = (date: Date) => date.getDate().toString().padStart(2, "0") + "/"
+  + (date.getMonth() + 1).toString().padStart(2, "0") + "/"
+  + date.getFullYear().toString();

@@ -1,8 +1,9 @@
 import React from "react";
 import { Text, View, StyleSheet, TextInput } from "react-native";
+import { IconButton } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { styles } from "../onboarding/OnboardingStyles";
-import { colours, nhs } from "../../globals";
+import { colours, dateFormat, nhs } from "../../globals";
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Button from "../../components/Button";
@@ -15,7 +16,9 @@ export interface PersonalDetailsResult {
 }
 
 interface PersonalDetailsProps {
-  callback: (details: PersonalDetailsResult) => void
+  addVaccinationCallback: (details: PersonalDetailsResult) => void,
+  addExpiryCallback: (details: PersonalDetailsResult) => void,
+  backCallback: () => void
 }
 
 interface PersonalDetailsState {
@@ -40,7 +43,8 @@ class PersonalDetails extends React.Component<PersonalDetailsProps, PersonalDeta
     this.updateName = this.updateName.bind(this);
     this.updateNhsNumber = this.updateNhsNumber.bind(this);
     this.updateDob = this.updateDob.bind(this);
-    this.submit = this.submit.bind(this);
+    this.addVaccination = this.addVaccination.bind(this);
+    this.addExpiry = this.addExpiry.bind(this);
   }
 
   updateName(newName: string) {
@@ -63,8 +67,16 @@ class PersonalDetails extends React.Component<PersonalDetailsProps, PersonalDeta
     this.setState({ displayDatePicker: true });
   }
 
-  submit() {
-    this.props.callback({
+  addVaccination() {
+    this.props.addVaccinationCallback({
+      name: this.state.name,
+      nhsNumber: this.state.nhsNumber,
+      dateOfBirth: Math.floor(this.state.dateOfBirth.getTime() / 1000)
+    });
+  }
+
+  addExpiry() {
+    this.props.addExpiryCallback({
       name: this.state.name,
       nhsNumber: this.state.nhsNumber,
       dateOfBirth: Math.floor(this.state.dateOfBirth.getTime() / 1000)
@@ -75,6 +87,15 @@ class PersonalDetails extends React.Component<PersonalDetailsProps, PersonalDeta
     return (
       <View style={styles.container}>
         <StatusBar translucent={true} style="light" />
+
+        {this.props.backCallback &&
+          <IconButton
+            icon="arrow-left"
+            size={24}
+            color={colours.lightest}
+            style={styles.backButton}
+            onPress={this.props.backCallback} />
+        }
 
         <SizedImage source={nhs} width={100} style={{ marginBottom: 32 }} />
 
@@ -108,7 +129,10 @@ class PersonalDetails extends React.Component<PersonalDetailsProps, PersonalDeta
           }
         </View>
 
-        <Button text="Continue" onPress={this.submit} />
+        <View style={additionalStyles.buttons}>
+          <Button text="Add Vaccination" onPress={this.addVaccination} />
+          <Button text="Add Expiry Date" onPress={this.addExpiry} style={{ marginTop: 18 }} />
+        </View>
       </View>
     )
   }
@@ -123,11 +147,10 @@ const additionalStyles = StyleSheet.create({
     padding: 12,
     borderRadius: 4,
     marginBottom: 16
+  },
+  buttons: {
+    width: "100%"
   }
 });
-
-const dateFormat = (date: Date) => date.getDate().toString().padStart(2, "0") + "/"
-  + (date.getMonth() + 1).toString().padStart(2, "0") + "/"
-  + date.getFullYear().toString();
 
 export default PersonalDetails;
