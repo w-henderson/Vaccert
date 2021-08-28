@@ -32,17 +32,6 @@ class Keystore {
       }
     });
   }
-
-  getKeys(): Promise<PublicKey[]> {
-    return this.db.ref("/keys").get().then(snapshot => {
-      let keys: PublicKey[] = [];
-      snapshot.forEach(child => {
-        let val = child.val();
-        keys.push(new PublicKey(val.key, val.name));
-      });
-      return keys;
-    });
-  }
 }
 
 export default Keystore;
