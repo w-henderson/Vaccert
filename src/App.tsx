@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Alert, Platform, UIManager } from "react-native";
+import { Provider } from "react-native-paper";
 import { loadAsync } from "expo-font";
 import * as SecureStore from "expo-secure-store";
 import { initFirebase } from "./crypto/keystore";
@@ -33,6 +34,7 @@ class App extends React.Component<{}, AppState> {
 
     this.loadedVaccert = this.loadedVaccert.bind(this);
     this.enterStaffMode = this.enterStaffMode.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
   componentDidMount() {
@@ -45,7 +47,10 @@ class App extends React.Component<{}, AppState> {
     }).then(() => {
       SecureStore.getItemAsync("VACCERT_MODE").then(mode => {
         if (mode === "client") {
-          this.setState({ phase: AppPhase.Client });
+          SecureStore.getItemAsync("VACCERT_CERT").then(cert => {
+            let certificate: Vaccert = JSON.parse(cert || "");
+            this.setState({ phase: AppPhase.Client, certificate });
+          })
         } else if (mode === "staff") {
           this.setState({ phase: AppPhase.Staff });
         } else {
@@ -55,7 +60,9 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
-  loadedVaccert(cert: Vaccert) {
+  async loadedVaccert(cert: Vaccert) {
+    await SecureStore.setItemAsync("VACCERT_MODE", "client");
+    await SecureStore.setItemAsync("VACCERT_CERT", JSON.stringify(cert));
     this.setState({ certificate: cert, phase: AppPhase.Client });
   }
 
@@ -75,19 +82,36 @@ class App extends React.Component<{}, AppState> {
       ]);
   }
 
+  async reset() {
+    await SecureStore.deleteItemAsync("VACCERT_MODE");
+    this.setState({ phase: AppPhase.Onboarding });
+  }
+
   render() {
     switch (this.state.phase) {
       case AppPhase.Onboarding:
-        return <Onboarding
-          clientCallback={this.loadedVaccert}
-          verifyCallback={() => this.setState({ phase: AppPhase.Verify })}
-          staffCallback={this.enterStaffMode} />;
+        return <Provider>
+          <Onboarding
+            clientCallback={this.loadedVaccert}
+            verifyCallback={() => this.setState({ phase: AppPhase.Verify })}
+            staffCallback={this.enterStaffMode} />
+        </Provider>;
 
-      case AppPhase.Client: return <Client certificate={this.state.certificate!} />
+      case AppPhase.Client: return <Provider>
+        <Client
+          certificate={this.state.certificate!}
+          reset={this.reset} />
+      </Provider>
 
-      case AppPhase.Verify: return <Verify finishCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
+      case AppPhase.Verify: return <Provider>
+        <Verify finishCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
+      </Provider>
 
-      case AppPhase.Staff: return <Staff backCallback={() => this.setState({ phase: AppPhase.Onboarding })} />
+      case AppPhase.Staff: return <Provider>
+        <Staff
+          backCallback={() => this.setState({ phase: AppPhase.Onboarding })}
+          reset={this.reset} />
+      </Provider>
 
       default: return null;
     }

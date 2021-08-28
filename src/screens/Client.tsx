@@ -11,7 +11,7 @@ import {
   ViewStyle
 } from "react-native";
 
-import { IconButton } from "react-native-paper";
+import { IconButton, Menu } from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 import { Vaccert } from "../types";
 import { colours, nhs } from "../globals";
@@ -30,22 +30,25 @@ enum ClientPhase {
 interface ClientProps {
   certificate: Vaccert,
   actionButtonText?: string,
-  actionButtonCallback?: () => void
+  actionButtonCallback?: () => void,
+  reset?: () => void
 }
 
 interface ClientState {
   informationHeight?: number,
   minimised: boolean,
-  phase: ClientPhase
+  phase: ClientPhase,
+  menuActive: boolean
 }
 
 class Client extends React.Component<ClientProps, ClientState> {
   constructor(props: ClientProps) {
     super(props);
-    this.state = { minimised: false, phase: ClientPhase.Default };
+    this.state = { minimised: false, phase: ClientPhase.Default, menuActive: false };
     this.updateHeight = this.updateHeight.bind(this);
     this.toggleMinimised = this.toggleMinimised.bind(this);
     this.showVaccinationInfo = this.showVaccinationInfo.bind(this);
+    this.removeVaccert = this.removeVaccert.bind(this);
   }
 
   parseTimestamp(timestamp: number): string {
@@ -80,6 +83,23 @@ class Client extends React.Component<ClientProps, ClientState> {
     );
   }
 
+  removeVaccert() {
+    Alert.alert(
+      "Remove Vaccert",
+      "Are you sure you want to remove your Vaccert? This cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => this.setState({ menuActive: false })
+        },
+        {
+          text: "OK",
+          onPress: this.props.reset!
+        }
+      ]);
+  }
+
   render() {
     if (this.state.phase === ClientPhase.Default) {
       let minimisedStyling: ViewStyle = this.state.minimised ?
@@ -91,7 +111,31 @@ class Client extends React.Component<ClientProps, ClientState> {
 
       return (
         <View style={styles.container}>
-          <StatusBar translucent={true} style="dark" />
+          <StatusBar
+            translucent={false}
+            style="dark"
+            backgroundColor={colours.light} />
+
+          {this.props.reset &&
+            <IconButton
+              icon="dots-vertical"
+              size={28}
+              color={colours.dark}
+              style={styles.icon}
+              onPress={() => this.setState({ menuActive: true })} />
+          }
+
+          <Menu
+            visible={this.state.menuActive}
+            onDismiss={() => this.setState({ menuActive: false })}
+            anchor={{ x: Dimensions.get("screen").width - 16, y: 0 }}
+            contentStyle={styles.menu}>
+
+            <Menu.Item
+              onPress={this.removeVaccert}
+              title="Remove Vaccert"
+              titleStyle={styles.menuItem} />
+          </Menu>
 
           <View style={styles.codeContainer}>
             <QRCode
@@ -193,6 +237,20 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1
+  },
+  icon: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    fontSize: 24,
+    color: colours.dark
+  },
+  menu: {
+    color: colours.dark,
+    backgroundColor: colours.light
+  },
+  menuItem: {
+    color: colours.dark
   }
 });
 
