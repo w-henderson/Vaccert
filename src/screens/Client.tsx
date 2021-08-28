@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Alert,
   Dimensions,
   LayoutAnimation,
   LayoutChangeEvent,
@@ -44,6 +45,7 @@ class Client extends React.Component<ClientProps, ClientState> {
     this.state = { minimised: false, phase: ClientPhase.Default };
     this.updateHeight = this.updateHeight.bind(this);
     this.toggleMinimised = this.toggleMinimised.bind(this);
+    this.showVaccinationInfo = this.showVaccinationInfo.bind(this);
   }
 
   parseTimestamp(timestamp: number): string {
@@ -70,6 +72,14 @@ class Client extends React.Component<ClientProps, ClientState> {
     this.setState({ minimised: !this.state.minimised });
   }
 
+  showVaccinationInfo(vaccinationId: number) {
+    let vaccination = this.props.certificate.data.vaccinations[vaccinationId];
+    Alert.alert(
+      "Vaccination Details",
+      `Vaccine: ${vaccination.vaccine}\nBatch: ${vaccination.batch}\nDate: ${this.parseTimestamp(vaccination.date)}`
+    );
+  }
+
   render() {
     if (this.state.phase === ClientPhase.Default) {
       let minimisedStyling: ViewStyle = this.state.minimised ?
@@ -86,7 +96,8 @@ class Client extends React.Component<ClientProps, ClientState> {
           <View style={styles.codeContainer}>
             <QRCode
               value={JSON.stringify(this.props.certificate)}
-              size={Dimensions.get("screen").width - (this.state.minimised ? 128 : 160)} />
+              size={Dimensions.get("screen").width - (this.state.minimised ? 128 : 160)}
+              backgroundColor={colours.light} />
           </View>
 
           <View style={[styles.infoContainer, minimisedStyling]} onLayout={this.updateHeight}>
@@ -109,13 +120,13 @@ class Client extends React.Component<ClientProps, ClientState> {
             <View style={styles.buttons}>
               <SmallButton
                 text={this.parseTimestamp(this.props.certificate.data.vaccinations[0].date)}
-                onPress={() => { }}
+                onPress={() => this.showVaccinationInfo(0)}
                 style={[styles.button, { marginRight: 12 }]} />
               <SmallButton
                 text={this.props.certificate.data.vaccinations.length > 1 ?
                   this.parseTimestamp(this.props.certificate.data.vaccinations[1].date) :
                   "Pending"}
-                onPress={() => { }}
+                onPress={this.props.certificate.data.vaccinations.length > 1 ? () => this.showVaccinationInfo(1) : () => { }}
                 style={[styles.button, { marginLeft: 12 }]} />
             </View>
 
