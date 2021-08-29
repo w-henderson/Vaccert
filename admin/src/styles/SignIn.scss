@@ -33,6 +33,12 @@ div.SignIn {
       }
     }
 
+    form > span {
+      display: block;
+      margin-top: 16px;
+      color: #dd2222;
+    }
+
     form > div {
       width: 100%;
       text-align: left;
