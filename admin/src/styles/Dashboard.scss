@@ -1,0 +1,10 @@
+div.Dashboard {
+  width: 100%;
+  height: 100%;
+  background-color: var(--light);
+  transition: width 500ms, height 500ms, border-radius 500ms;
+
+  > div {
+    transition: opacity 500ms;
+  }
+}

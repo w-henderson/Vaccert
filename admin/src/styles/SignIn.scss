@@ -1,6 +1,6 @@
 div.SignIn {
-  background-color: var(--light);
   width: 464px;
+  background-color: var(--light);
   border-radius: 8px;
   box-shadow: 0 0 64px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -27,6 +27,11 @@ div.SignIn {
       border-radius: 8px;
       border: 2px solid rgba(0, 0, 0, 0.1);
       outline: none;
+      transition: 200ms;
+
+      &:focus {
+        border: 2px solid rgba(0, 0, 0, 0.2);
+      }
 
       &:not(:last-of-type) {
         margin-bottom: 16px;

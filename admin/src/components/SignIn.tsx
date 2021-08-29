@@ -9,7 +9,7 @@ import NhsLogo from '../images/NhsLogo';
 import Loading from "./Loading";
 
 interface SignInProps {
-  successCallback: (user: User) => void
+  successCallback: (user: User, dimensions: { width: number, height: number }) => void
 }
 
 interface SignInState {
@@ -23,6 +23,7 @@ interface SignInState {
 
 class SignIn extends React.Component<SignInProps, SignInState> {
   authListener?: Unsubscribe;
+  divRef: HTMLDivElement | null;
 
   constructor(props: SignInProps) {
     super(props);
@@ -35,6 +36,7 @@ class SignIn extends React.Component<SignInProps, SignInState> {
       error: null
     };
 
+    this.divRef = null;
     this.submit = this.submit.bind(this);
     this.verifyUser = this.verifyUser.bind(this);
   }
@@ -82,7 +84,10 @@ class SignIn extends React.Component<SignInProps, SignInState> {
       .then(snapshot => {
         if (snapshot.exists()) {
           if (snapshot.val() === user.uid) {
-            this.props.successCallback(user);
+            this.props.successCallback(user, {
+              width: this.divRef!.clientWidth,
+              height: this.divRef!.clientHeight
+            });
             return true;
           } else {
             this.setState({ error: "You are not authorised to access the admin dashboard", password: "", loading: false });
@@ -102,7 +107,7 @@ class SignIn extends React.Component<SignInProps, SignInState> {
   render() {
     if (!this.state.loading && this.state.ready) {
       return (
-        <div className="SignIn">
+        <div className="SignIn" ref={el => { this.divRef = el }}>
           <div className="logo">
             <NhsLogo />
           </div>
@@ -145,7 +150,7 @@ class SignIn extends React.Component<SignInProps, SignInState> {
       );
     } else {
       return (
-        <div className="SignIn">
+        <div className="SignIn" ref={el => { this.divRef = el }}>
           <div className="logo">
             <NhsLogo />
           </div>

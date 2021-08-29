@@ -3,9 +3,6 @@
 body {
   margin: 0;
   font-family: Inter;
-  display: flex;
-  place-items: center;
-  place-content: center;
   background: linear-gradient(to bottom right, var(--accentLight), var(--accent));
 
   --lightest: #ffffff;
@@ -15,8 +12,14 @@ body {
   --accentLight: #277cd1;
 }
 
-body, html {
+body, html, div#root {
   height: 100%;
+}
+
+div#root {
+  display: flex;
+  place-items: center;
+  place-content: center;
 }
 
 * {

@@ -6,11 +6,13 @@ import { getAuth, User } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 import SignIn from "./components/SignIn";
+import Dashboard from "./components/Dashboard";
 import FirebaseContext, { FirebaseUtils } from "./FirebaseContext";
 
 interface AppState {
   firebase: FirebaseUtils,
-  user?: User
+  user?: User,
+  dimensions?: { width: number, height: number }
 }
 
 class App extends React.Component<{}, AppState> {
@@ -42,8 +44,8 @@ class App extends React.Component<{}, AppState> {
     this.signedIn = this.signedIn.bind(this);
   }
 
-  signedIn(user: User) {
-    this.setState({ user });
+  signedIn(user: User, dimensions: { width: number, height: number }) {
+    this.setState({ user, dimensions });
   }
 
   render() {
@@ -55,7 +57,9 @@ class App extends React.Component<{}, AppState> {
       );
     } else {
       return (
-        <div>Signed in</div>
+        <FirebaseContext.Provider value={this.state.firebase}>
+          <Dashboard dimensions={this.state.dimensions!} />
+        </FirebaseContext.Provider>
       )
     }
   }
