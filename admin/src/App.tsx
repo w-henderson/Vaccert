@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.scss';
 
+import SignIn from './components/SignIn';
+
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
-        App
-      </div>
+      <SignIn />
     );
   }
 }
