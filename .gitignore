@@ -12,6 +12,8 @@ web-build/
 keys/
 coverage/
 .expo-shared/
+target/
+pkg/
 
 # macOS
 .DS_Store
