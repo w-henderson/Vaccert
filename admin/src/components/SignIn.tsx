@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/SignIn.scss';
 
-import { browserLocalPersistence, browserSessionPersistence, setPersistence, signInWithEmailAndPassword, User, UserCredential } from 'firebase/auth';
+import { browserLocalPersistence, browserSessionPersistence, setPersistence, signInWithEmailAndPassword, Unsubscribe, User } from 'firebase/auth';
 import { get, ref } from 'firebase/database';
 import FirebaseContext from '../FirebaseContext';
 
@@ -17,10 +17,13 @@ interface SignInState {
   password: string,
   rememberMe: boolean,
   loading: boolean,
+  ready: boolean,
   error: string | null
 }
 
 class SignIn extends React.Component<SignInProps, SignInState> {
+  authListener?: Unsubscribe;
+
   constructor(props: SignInProps) {
     super(props);
     this.state = {
@@ -28,10 +31,34 @@ class SignIn extends React.Component<SignInProps, SignInState> {
       password: "",
       rememberMe: false,
       loading: false,
+      ready: false,
       error: null
     };
 
     this.submit = this.submit.bind(this);
+    this.verifyUser = this.verifyUser.bind(this);
+  }
+
+  componentDidMount() {
+    this.authListener = this.context.auth.onAuthStateChanged((user: User | null) => {
+      if (user === null) {
+        this.setState({ ready: true });
+      } else {
+        this.verifyUser(user).then(result => {
+          if (!result) {
+            this.context.auth.signOut();
+            this.setState({ ready: true });
+          }
+        })
+      }
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.authListener !== undefined) {
+      this.authListener();
+      this.authListener = undefined;
+    }
   }
 
   async submit(e: React.FormEvent<HTMLFormElement>) {
@@ -42,24 +69,6 @@ class SignIn extends React.Component<SignInProps, SignInState> {
     else await setPersistence(this.context.auth, browserSessionPersistence);
 
     await signInWithEmailAndPassword(this.context.auth, this.state.email, this.state.password)
-      .then((user: UserCredential) => {
-        let adminRef = ref(this.context.database, "admin");
-        get(adminRef)
-          .then(snapshot => {
-            if (snapshot.exists()) {
-              if (snapshot.val() === user.user.uid) {
-                this.props.successCallback(user.user);
-              } else {
-                this.setState({ error: "You are not authorised to access the admin dashboard", password: "", loading: false });
-              }
-            } else {
-              this.setState({ error: "Cannot find admin user ID in the database, please check your database structure", loading: false });
-            }
-          })
-          .catch(() => {
-            this.setState({ error: "Cannot find admin user ID in the database, please check your database structure", loading: false });
-          })
-      })
       .catch(() => {
         this.setState({ error: "Invalid email or password, please try again", password: "", loading: false });
       });
@@ -67,8 +76,31 @@ class SignIn extends React.Component<SignInProps, SignInState> {
     return false;
   }
 
+  verifyUser(user: User): Promise<boolean> {
+    let adminRef = ref(this.context.database, "admin");
+    return get(adminRef)
+      .then(snapshot => {
+        if (snapshot.exists()) {
+          if (snapshot.val() === user.uid) {
+            this.props.successCallback(user);
+            return true;
+          } else {
+            this.setState({ error: "You are not authorised to access the admin dashboard", password: "", loading: false });
+            return false;
+          }
+        } else {
+          this.setState({ error: "Cannot find admin user ID in the database, please check your database structure", loading: false });
+          return false;
+        }
+      })
+      .catch(() => {
+        this.setState({ error: "Cannot find admin user ID in the database, please check your database structure", loading: false });
+        return false;
+      })
+  }
+
   render() {
-    if (!this.state.loading) {
+    if (!this.state.loading && this.state.ready) {
       return (
         <div className="SignIn">
           <div className="logo">
