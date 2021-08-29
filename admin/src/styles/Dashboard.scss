@@ -3,8 +3,192 @@ div.Dashboard {
   height: 100%;
   background-color: var(--light);
   transition: width 500ms, height 500ms, border-radius 500ms;
+  overflow: auto;
 
   > div {
     transition: opacity 500ms;
+
+    h1 {
+      font-weight: 600;
+      margin: 0 auto 16px auto;
+    }
+
+    header {
+      width: 100%;
+      padding: 32px 64px;
+      color: var(--lightest);
+      background: linear-gradient(to bottom right, var(--accentLight), var(--accent));
+      font-size: 1.5em;
+      text-align: left;
+
+      div {
+        max-width: 1000px;
+        margin: 16px auto;
+
+        &:first-child {
+          padding: 0 0 16px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        &:nth-child(2) {
+          margin: 64px auto 32px auto;
+          padding-right: 33%;
+        }
+      }
+
+      svg {
+        fill: var(--lightest);
+      }
+    }
+
+    > div.content {
+      padding: 64px 0;
+      margin: 0 auto;
+      max-width: 1000px;
+
+      > span {
+        font-size: 18px;
+      }
+
+      div.keys {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 32px;
+
+        div.key {
+          flex: 1;
+          font-size: 20px;
+          border: 2px solid rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          background-color: var(--lightest);
+          max-width: 323px;
+          box-shadow: 0 0 32px rgba(0, 0, 0, 0.025);
+
+          &.add {
+            display: flex;
+            place-items: center;
+            place-content: center;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 200ms;
+
+            &:hover {
+              opacity: 0.25;
+            }
+          }
+
+          > div:first-child {
+            padding: 16px;
+
+            span {
+              display: block;
+              width: 100%;
+
+              &:last-child {
+                font-size: 12px;
+                margin-top: 4px;
+                opacity: 0.4;
+              }
+            }
+          }
+
+          > div:last-child {
+            padding: 0px;
+            font-weight: 600;
+            font-size: 16px;
+            background-color: var(--light);
+            border-top: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 8px 8px;
+            cursor: pointer;
+
+            span {
+              padding: 12px 0;
+              display: inline-block;
+              text-align: center;
+              height: 100%;
+              width: 50%;
+              transition: background-color 200ms;
+              
+              &:first-child { border-right: 1px solid rgba(0, 0, 0, 0.1); }
+              &:last-child { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+
+              &:hover {
+                background-color: rgba(255, 255, 255, 0.5);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    > div.popup {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      transition: opacity 250ms;
+
+      &.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      > div {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--light);
+        border-radius: 8px;
+        box-shadow: 0 0 64px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(0, 0, 0, 0.2);
+
+        h1 {
+          padding: 32px 32px 8px 32px;
+          margin: 0;
+          background-color: var(--lightest);
+        }
+
+        span:not(.close) {
+          display: block;
+          padding: 0 32px 32px 32px;
+          opacity: 1;
+          color: rgba(0, 0, 0, 0.5);
+          border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+          background-color: var(--lightest);
+        }
+
+        span.close {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          cursor: pointer;
+          opacity: 0.5;
+        }
+
+        textarea {
+          display: block;
+          width: 512px;
+          border-radius: 4px;
+          border: 2px solid rgba(0, 0, 0, 0.1);
+          resize: none;
+          margin: 32px;
+        }
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  div.Dashboard > div header div:nth-child(2) {
+    padding-right: 0;
+  }
+
+  div.Dashboard > div > div {
+    padding: 64px 32px;
   }
 }
