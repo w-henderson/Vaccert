@@ -1,0 +1,14 @@
+{
+  "rules": {
+    ".read": "root.child('admin').val() == auth.uid",
+    ".write": "root.child('admin').val() == auth.uid",
+    "admin": {
+      ".read": "auth != null"
+    },
+    "keys": {
+      "$key": {
+        ".read": true
+      }
+    }
+  }
+}
