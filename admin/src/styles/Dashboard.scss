@@ -21,18 +21,21 @@ div.Dashboard {
       font-size: 1.5em;
       text-align: left;
 
-      div {
+      div.logo, div.text {
         max-width: 1000px;
         margin: 16px auto;
 
-        &:first-child {
+        &.logo {
+          display: flex;
+          place-items: center;
+          height: 60px;
           padding: 0 0 16px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        &:nth-child(2) {
+        &.text {
           margin: 64px auto 32px auto;
-          padding-right: 33%;
+          padding-right: 333px;
         }
       }
 
@@ -183,12 +186,12 @@ div.Dashboard {
   }
 }
 
-@media only screen and (max-width: 800px) {
-  div.Dashboard > div header div:nth-child(2) {
-    padding-right: 0;
+@media only screen and (max-width: 1000px) {
+  div.Dashboard > div header div.text {
+    padding-right: 0 !important;
   }
 
   div.Dashboard > div > div {
-    padding: 64px 32px;
+    padding: 64px !important;
   }
 }

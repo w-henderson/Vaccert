@@ -2,8 +2,9 @@ import React from 'react';
 import "../styles/Dashboard.scss";
 
 import NhsLogo from '../images/NhsLogo';
+import Keygen from './Keygen';
 
-import { DatabaseReference, onValue, ref } from 'firebase/database';
+import { DatabaseReference, onValue, ref, remove } from 'firebase/database';
 import FirebaseContext from '../FirebaseContext';
 
 enum AnimationPhase {
@@ -19,7 +20,8 @@ interface DashboardProps {
 interface DashboardState {
   animationPhase: AnimationPhase,
   keys: Key[],
-  keyPopup?: Key
+  keyPopup?: Key,
+  keyGen: boolean
 }
 
 interface Key {
@@ -33,8 +35,9 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
 
   constructor(props: DashboardProps, context: typeof FirebaseContext) {
     super(props, context);
-    this.state = { animationPhase: AnimationPhase.Before, keys: [] };
+    this.state = { animationPhase: AnimationPhase.Before, keys: [], keyGen: false };
     this.keysRef = ref(this.context.database, "keys");
+    this.deleteKey = this.deleteKey.bind(this);
   }
 
   componentDidMount() {
@@ -58,6 +61,14 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.setState({ keyPopup: key });
   }
 
+  deleteKey(id: string) {
+    let confirmation = window.confirm("Are you sure you want to delete this key? This will permanently invalidate all Vaccerts signed by it.");
+    if (confirmation) {
+      let keyRef = ref(this.context.database, `keys/${id}`);
+      remove(keyRef);
+    }
+  }
+
   render() {
     if (this.state.animationPhase === AnimationPhase.Before) {
       return (
@@ -68,7 +79,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
           overflow: "hidden"
         }}></div>
       );
-    } else {
+    } else if (!this.state.keyGen) {
       return (
         <div className="Dashboard main">
           <div style={{
@@ -76,11 +87,11 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             overflow: this.state.animationPhase === AnimationPhase.After ? "auto" : "hidden"
           }}>
             <header>
-              <div>
+              <div className="logo">
                 <NhsLogo />
               </div>
 
-              <div>
+              <div className="text">
                 <h1>Vaccert Admin Console</h1>
                 Welcome to the Vaccert admin console, where you can manage and generate certification keys.
               </div>
@@ -101,12 +112,12 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                     </div>
                     <div>
                       <span onClick={() => this.showKeyPopup(key)}>View</span>
-                      <span onClick={() => { }}>Remove</span>
+                      <span onClick={() => this.deleteKey(key.id)}>Remove</span>
                     </div>
                   </div>
                 )}
 
-                <div className="key add">
+                <div className="key add" onClick={() => this.setState({ keyGen: true })}>
                   Generate another key
                 </div>
               </div>
@@ -126,12 +137,15 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
                 <textarea
                   value={formatKey(this.state.keyPopup?.key) || ""}
                   rows={formatKey(this.state.keyPopup?.key)?.split("\n").length || 0}
-                  contentEditable={false} />
+                  contentEditable={false}
+                  readOnly={true} />
               </div>
             </div>
           </div>
         </div >
       );
+    } else {
+      return <Keygen finishCallback={() => this.setState({ keyGen: false })} />
     }
   }
 }

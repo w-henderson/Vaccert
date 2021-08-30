@@ -1,0 +1,54 @@
+div.Keygen {
+  div.logo {
+    position: relative;
+    
+    div.back {
+      position: absolute;
+      right: 0;
+      display: block;
+      float: right;
+
+      span {
+        font-size: 32px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  div.content {
+    input, select {
+      padding: 16px;
+      font-family: Inter;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      outline: none;
+      margin: 0 16px 16px 0;
+      transition: border 200ms, background-color 200ms;
+
+      &:focus {
+        border: 2px solid rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    input[type=text] {
+      width: 400px;
+    }
+
+    input[type=submit] {
+      background-color: var(--accentLight);
+      color: var(--lightest);
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #4997e6;
+      }
+    }
+
+    svg {
+      display: block;
+      margin: 32px 0;
+    }
+  }
+}
