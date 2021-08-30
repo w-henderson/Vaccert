@@ -58,7 +58,9 @@ class App extends React.Component<{}, AppState> {
     } else {
       return (
         <FirebaseContext.Provider value={this.state.firebase}>
-          <Dashboard dimensions={this.state.dimensions!} />
+          <Dashboard
+            dimensions={this.state.dimensions!}
+            signedOut={() => this.setState({ user: undefined })} />
         </FirebaseContext.Provider>
       )
     }

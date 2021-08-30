@@ -1,20 +1,4 @@
 div.Keygen {
-  div.logo {
-    position: relative;
-    
-    div.back {
-      position: absolute;
-      right: 0;
-      display: block;
-      float: right;
-
-      span {
-        font-size: 32px;
-        cursor: pointer;
-      }
-    }
-  }
-
   div.content {
     input, select {
       padding: 16px;

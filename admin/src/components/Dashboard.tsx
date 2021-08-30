@@ -14,7 +14,8 @@ enum AnimationPhase {
 }
 
 interface DashboardProps {
-  dimensions: { width: number, height: number }
+  dimensions: { width: number, height: number },
+  signedOut: () => void
 }
 
 interface DashboardState {
@@ -38,6 +39,7 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     this.state = { animationPhase: AnimationPhase.Before, keys: [], keyGen: false };
     this.keysRef = ref(this.context.database, "keys");
     this.deleteKey = this.deleteKey.bind(this);
+    this.signOut = this.signOut.bind(this);
   }
 
   componentDidMount() {
@@ -69,6 +71,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
     }
   }
 
+  signOut() {
+    this.context.auth.signOut().then(this.props.signedOut);
+  }
+
   render() {
     if (this.state.animationPhase === AnimationPhase.Before) {
       return (
@@ -89,6 +95,10 @@ class Dashboard extends React.Component<DashboardProps, DashboardState> {
             <header>
               <div className="logo">
                 <NhsLogo />
+
+                <div className="back">
+                  <span className="material-icons" onClick={this.signOut}>logout</span>
+                </div>
               </div>
 
               <div className="text">
